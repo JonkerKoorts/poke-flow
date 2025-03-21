@@ -24,7 +24,11 @@ source venv/bin/activate
 
 3. Install the required Python packages:
 ```bash
-pip install -r requirements.txt
+# On Windows
+pip install -r requirements-win.txt
+
+# On macOS/Linux
+pip install -r requirements-unix.txt
 ```
 
 4. Start the FastAPI server:
@@ -59,7 +63,8 @@ The frontend application will be running at `http://localhost:3000`
   - `main.py` - Main application entry point
   - `helper_functions.py` - Utility functions
   - `common.py` - Shared constants and helpers
-  - `requirements.txt` - Python dependencies
+  - `requirements-win.txt` - Python dependencies for Windows
+  - `requirements-unix.txt` - Python dependencies for macOS/Linux
 
 - `/frontend` - Next.js frontend application
   - `/src/app` - Application routes and pages
