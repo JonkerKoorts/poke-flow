@@ -1,4 +1,3 @@
-import { fetchPokemonByGender } from "@/lib/services/api.service";
 import React, { Suspense } from "react";
 import Gender from "@/components/choices/Gender";
 
