@@ -17,6 +17,13 @@ _,-'       `.     |    |  /`.   \,-'    |   \  /   |   |    \  |`.
                                 `'                            '-._|
 ```
 
+## 📋 Prerequisites
+
+This project requires Node.js and Python to be installed on your system:
+
+- 🟢 Node.js (v18 or higher) - [Download Node.js](https://nodejs.org/)
+- 🐍 Python (v3.8 or higher) - [Download Python](https://www.python.org/downloads/)
+
 ## 🚀 Quick Start
 
 ### Backend Setup
