@@ -30,14 +30,13 @@ async def get_pokemon_by_gender(gender_choice: str):
         gender_data = response.json()
         pokemon_entries = gender_data.get("pokemon_species_details", [])
 
-        categorized = {}
+        pokemon_list = []
         for entry in pokemon_entries[:20]:  # Limit to 20 for speed
             species_name = entry["pokemon_species"]["name"]
             pokemon_url = f"https://pokeapi.co/api/v2/pokemon/{species_name}"
             
             pokemon_data = await fetch_pokemon_data(pokemon_url)
+            if pokemon_data:
+                pokemon_list.append(pokemon_data)
 
-            for t in pokemon_data.get("types", []):
-                categorized.setdefault(t, []).append(pokemon_data["name"])
-
-        return categorized
+        return pokemon_list
