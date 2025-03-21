@@ -10,9 +10,7 @@ const GenderPage = () => {
         </p>
         <h1 className="text-4xl uppercase font-semibold">Gender</h1>
       </div>
-      <Suspense fallback={<div>Loading...</div>}>
-        <Gender />
-      </Suspense>
+      <Gender />
     </div>
   );
 };

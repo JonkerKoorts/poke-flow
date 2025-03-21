@@ -2,42 +2,70 @@
 
 import { fetchPokemonByGender } from "@/lib/services/api.service";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 
 const Gender = () => {
   const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedGender, setSelectedGender] = useState<
+    "male" | "female" | null
+  >(null);
 
-  const handleChooseMale = async () => {
-    const data = await fetchPokemonByGender("male");
+  const handleChooseGender = async (gender: "male" | "female") => {
+    setIsLoading(true);
+    setSelectedGender(gender);
+    const data = await fetchPokemonByGender(gender);
     if (data) {
       router.push(
-        `/gender/male?data=${encodeURIComponent(JSON.stringify(data))}`
+        `/gender/${gender}?data=${encodeURIComponent(JSON.stringify(data))}`
       );
     }
-  };
-
-  const handleChooseFemale = async () => {
-    const data = await fetchPokemonByGender("female");
-    if (data) {
-      router.push(
-        `/gender/female?data=${encodeURIComponent(JSON.stringify(data))}`
-      );
-    }
+    setIsLoading(false);
   };
 
   return (
     <div className="flex justify-center items-center gap-10">
       <button
-        onClick={handleChooseMale}
-        className="mt-5 underline text-blue-400"
+        onClick={() => handleChooseGender("male")}
+        disabled={isLoading}
+        className={`px-6 py-2 rounded-lg transition-all duration-200 
+          ${
+            isLoading && selectedGender === "male"
+              ? "bg-blue-400 cursor-not-allowed"
+              : isLoading
+              ? "bg-gray-200 cursor-not-allowed"
+              : "bg-blue-500 hover:bg-blue-600 active:bg-blue-700"
+          } text-white font-medium`}
       >
-        Male
+        {isLoading && selectedGender === "male" ? (
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            Loading...
+          </div>
+        ) : (
+          "Male"
+        )}
       </button>
       <button
-        onClick={handleChooseFemale}
-        className="mt-5 underline text-blue-400"
+        onClick={() => handleChooseGender("female")}
+        disabled={isLoading}
+        className={`px-6 py-2 rounded-lg transition-all duration-200 
+          ${
+            isLoading && selectedGender === "female"
+              ? "bg-blue-400 cursor-not-allowed"
+              : isLoading
+              ? "bg-gray-200 cursor-not-allowed"
+              : "bg-blue-500 hover:bg-blue-600 active:bg-blue-700"
+          } text-white font-medium`}
       >
-        Female
+        {isLoading && selectedGender === "female" ? (
+          <div className="flex items-center gap-2">
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            Loading...
+          </div>
+        ) : (
+          "Female"
+        )}
       </button>
     </div>
   );
