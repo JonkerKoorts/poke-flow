@@ -53,7 +53,9 @@ const MalePage: React.FC = () => {
   const renderTypesView = () => (
     <>
       <div className="mb-4">
-        <h2 className="text-xl font-semibold mb-2">Filter by Type:</h2>
+        <h2 className="text-xl font-semibold mb-2 text-[#FFDE00]">
+          Filter by Type:
+        </h2>
         {availableTypes.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {availableTypes.map((type) => (
@@ -61,12 +63,12 @@ const MalePage: React.FC = () => {
                 key={type}
                 onClick={() => handleTypeSelect(type)}
                 disabled={isLoading}
-                className={`px-3 py-1 rounded transition-all duration-200 ${
+                className={`px-3 py-1 rounded transition-all duration-300 ${
                   isLoading ? "opacity-50 cursor-not-allowed" : ""
                 } ${
                   selectedType === type
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-200 hover:bg-gray-300"
+                    ? "bg-[#3B4CCA] text-white shadow-[0_0_20px_rgba(59,76,202,0.3)]"
+                    : "bg-white/10 text-white hover:bg-white/20 hover:shadow-[0_0_20px_rgba(255,255,255,0.1)]"
                 }`}
               >
                 {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -75,7 +77,7 @@ const MalePage: React.FC = () => {
           </div>
         ) : (
           <div className="flex items-center justify-center h-12">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[#3B4CCA]"></div>
           </div>
         )}
       </div>
@@ -87,17 +89,17 @@ const MalePage: React.FC = () => {
               <div
                 key={pokemon.name}
                 onClick={() => router.push(`/types/${pokemon.types[0]}`)}
-                className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
+                className="border border-white/10 rounded-xl p-4 bg-white/5 hover:bg-white/10 transition-all duration-300 cursor-pointer hover:shadow-[0_0_30px_rgba(59,76,202,0.2)]"
               >
                 <img
                   src={pokemon.sprite}
                   alt={pokemon.name}
                   className="w-24 h-24 mx-auto"
                 />
-                <h3 className="text-lg font-semibold capitalize text-center">
+                <h3 className="text-lg font-semibold capitalize text-center text-white mt-2">
                   {pokemon.name}
                 </h3>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-neutral-300">
                   <p>Types: {pokemon.types.join(", ")}</p>
                   <p>Abilities: {pokemon.abilities.join(", ")}</p>
                 </div>
@@ -114,23 +116,23 @@ const MalePage: React.FC = () => {
       {rolesData && (
         <div className="space-y-8">
           {Object.entries(rolesData).map(([role, pokemons]: [string, any]) => (
-            <div key={role} className="border-b pb-6">
-              <h2 className="text-2xl font-bold mb-4">{role}</h2>
+            <div key={role} className="border-b border-white/10 pb-6">
+              <h2 className="text-2xl font-bold mb-4 text-[#FFDE00]">{role}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {pokemons.map((pokemon: any) => (
                   <div
                     key={pokemon.name}
-                    className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200"
+                    className="border border-white/10 rounded-xl p-4 bg-white/5 hover:bg-white/10 transition-all duration-300 hover:shadow-[0_0_30px_rgba(59,76,202,0.2)]"
                   >
                     <img
                       src={pokemon.sprite}
                       alt={pokemon.name}
                       className="w-24 h-24 mx-auto"
                     />
-                    <h3 className="text-lg font-semibold capitalize text-center">
+                    <h3 className="text-lg font-semibold capitalize text-center text-white mt-2">
                       {pokemon.name}
                     </h3>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm text-neutral-300">
                       <p>Types: {pokemon.types.join(", ")}</p>
                       <div className="mt-2">
                         <div className="grid grid-cols-2 gap-2">
@@ -156,25 +158,25 @@ const MalePage: React.FC = () => {
   );
 
   return (
-    <div className="p-4">
-      <div className="flex justify-center mb-6">
-        <div className="inline-flex rounded-lg border border-gray-200">
+    <div className="min-h-screen bg-gradient-to-br from-[#0B0F2F] via-[#111C44] to-[#0B0F2F] text-white p-8 animate-fade-in">
+      <div className="flex justify-center mb-8">
+        <div className="inline-flex rounded-xl border border-white/20">
           <button
             onClick={() => setViewMode("types")}
-            className={`px-4 py-2 rounded-l-lg ${
+            className={`px-6 py-3 rounded-l-xl transition-all duration-300 font-bold ${
               viewMode === "types"
-                ? "bg-blue-500 text-white"
-                : "bg-white text-gray-600 hover:bg-gray-50"
+                ? "bg-[#3B4CCA] text-white shadow-[0_0_20px_rgba(59,76,202,0.3)]"
+                : "text-white hover:bg-white/10"
             }`}
           >
             Types
           </button>
           <button
             onClick={() => setViewMode("roles")}
-            className={`px-4 py-2 rounded-r-lg ${
+            className={`px-6 py-3 rounded-r-xl transition-all duration-300 font-bold ${
               viewMode === "roles"
-                ? "bg-blue-500 text-white"
-                : "bg-white text-gray-600 hover:bg-gray-50"
+                ? "bg-[#3B4CCA] text-white shadow-[0_0_20px_rgba(59,76,202,0.3)]"
+                : "text-white hover:bg-white/10"
             }`}
           >
             Battle Roles
@@ -184,8 +186,8 @@ const MalePage: React.FC = () => {
 
       {isLoading ? (
         <div className="flex flex-col items-center justify-center min-h-[200px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-          <p className="mt-4 text-gray-600">Loading Pokémon...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#3B4CCA]"></div>
+          <p className="mt-4 text-neutral-300">Loading Pokémon...</p>
         </div>
       ) : viewMode === "types" ? (
         renderTypesView()

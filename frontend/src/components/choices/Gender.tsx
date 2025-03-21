@@ -25,19 +25,18 @@ const Gender = () => {
   };
 
   return (
-    <div className="flex justify-center items-center gap-3 mt-5">
+    <div className="flex justify-center items-center gap-6 mt-8">
       <Button
         onClick={() => handleChooseGender("male")}
         disabled={isLoading}
-        variant={"outline"}
-        className={`transition-all duration-200 hover:text-white 
-          ${
-            isLoading && selectedGender === "male"
-              ? "bg-blue-400 cursor-not-allowed"
-              : isLoading
-              ? "bg-gray-200 cursor-not-allowed"
-              : "bg-blue-500 hover:bg-blue-600 active:bg-blue-700"
-          } text-white font-medium`}
+        variant="outline"
+        className={`px-6 py-3 text-lg font-extrabold tracking-widest uppercase transition-all duration-300 border-2 rounded-xl ${
+          isLoading && selectedGender === "male"
+            ? "bg-[#3B4CCA] cursor-not-allowed"
+            : isLoading
+            ? "bg-gray-200 cursor-not-allowed"
+            : "border-[#3B4CCA] text-[#3B4CCA] hover:bg-[#3B4CCA] hover:text-white hover:shadow-[0_0_30px_#3B4CCA]"
+        }`}
       >
         {isLoading && selectedGender === "male" ? (
           <div className="flex items-center gap-2">
@@ -51,15 +50,14 @@ const Gender = () => {
       <Button
         onClick={() => handleChooseGender("female")}
         disabled={isLoading}
-        variant={"outline"}
-        className={`rounded-lg transition-all duration-200 hover:text-white
-          ${
-            isLoading && selectedGender === "female"
-              ? "bg-blue-400 cursor-not-allowed"
-              : isLoading
-              ? "bg-gray-200 cursor-not-allowed"
-              : "bg-blue-500 hover:bg-blue-600 active:bg-blue-700"
-          } text-white font-medium`}
+        variant="outline"
+        className={`px-6 py-3 text-lg font-extrabold tracking-widest uppercase transition-all duration-300 border-2 rounded-xl ${
+          isLoading && selectedGender === "female"
+            ? "bg-[#3B4CCA] cursor-not-allowed"
+            : isLoading
+            ? "bg-gray-200 cursor-not-allowed"
+            : "border-[#FF0000] text-[#FF0000] hover:bg-[#FF0000] hover:text-white hover:shadow-[0_0_30px_#FF0000]"
+        }`}
       >
         {isLoading && selectedGender === "female" ? (
           <div className="flex items-center gap-2">
