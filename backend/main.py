@@ -3,6 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 import httpx
 from .common import api_url_build
 from backend.helper_functions import fetch_pokemon_data, categorize_pokemon_role
+from rich.console import Console
+from rich.panel import Panel
+from rich.table import Table
+from rich import print as rprint
+
+console = Console()
 
 app = FastAPI()
 
@@ -20,20 +26,15 @@ app.add_middleware(
 
 @app.get("/pokemon-by-gender/{gender_choice}")
 async def get_pokemon_by_gender(gender_choice: str):
-    """
-    Fetch Pokemon filtered by gender.
+    console.rule(f"[bold blue]Fetching Pokemon by Gender: {gender_choice}")
     
-    Args:
-        gender_choice (str): The gender to filter by ('male' or 'female')
-        
-    Returns:
-        list: List of Pokemon matching the gender criteria
-    """
     gender_url = api_url_build("gender", gender_choice.lower())
-
+    console.print(f"[dim]API URL: {gender_url}[/dim]")
+    
     async with httpx.AsyncClient() as client:
         response = await client.get(gender_url)
         if response.status_code != 200:
+            console.print("[bold red]Error:[/bold red] Failed to fetch gender data")
             return {"error": "Failed to fetch gender data"}
 
         gender_data = response.json()
@@ -53,23 +54,42 @@ async def get_pokemon_by_gender(gender_choice: str):
 # refine gender choice by narrowing down via types
 @app.get("/pokemon-by-type/{type_choice}")
 async def get_pokemon_by_type(type_choice: str):
+    console.rule(f"[bold green]Fetching Pokemon by Type: {type_choice}")
+    
     type_url = api_url_build("type", type_choice.lower())
+    console.print(f"[dim]API URL: {type_url}[/dim]")
+    
     async with httpx.AsyncClient() as client:
         response = await client.get(type_url)
         if response.status_code != 200:
+            console.print("[bold red]Error:[/bold red] Failed to fetch type data")
             return {"error": "Failed to fetch type data"}
+            
         type_data = response.json()
         pokemon_entries = type_data.get("pokemon", [])
 
-        pokemon_list = []
-        for entry in pokemon_entries[:20]:  # Limit to 20 for speed
-            species_name = entry["pokemon"]["name"]
-            pokemon_url = f"https://pokeapi.co/api/v2/pokemon/{species_name}"
-            
-            pokemon_data = await fetch_pokemon_data(pokemon_url)
-            if pokemon_data:
-                pokemon_list.append(pokemon_data)
+        # Create a table for displaying Pokemon data
+        table = Table(title=f"Pokemon of Type: {type_choice}")
+        table.add_column("Name", style="cyan")
+        table.add_column("Types", style="green")
+        table.add_column("Abilities", style="yellow")
 
+        pokemon_list = []
+        with console.status("[bold green]Fetching Pokemon details...") as status:
+            for entry in pokemon_entries[:20]:
+                species_name = entry["pokemon"]["name"]
+                pokemon_url = f"https://pokeapi.co/api/v2/pokemon/{species_name}"
+                
+                pokemon_data = await fetch_pokemon_data(pokemon_url)
+                if pokemon_data:
+                    pokemon_list.append(pokemon_data)
+                    table.add_row(
+                        pokemon_data["name"],
+                        ", ".join(pokemon_data["types"]),
+                        ", ".join(pokemon_data["abilities"])
+                    )
+
+        console.print(table)
         return pokemon_list
 
 @app.get("/pokemon-by-gender/{gender_choice}/filter/{type_choice}")
@@ -128,12 +148,15 @@ async def get_available_types(gender_choice: str):
 
 @app.get("/pokemon-roles/{gender_choice}")
 async def get_pokemon_roles(gender_choice: str):
-    """Get Pokemon categorized by battle roles for a specific gender."""
+    console.rule(f"[bold magenta]Categorizing Pokemon Roles for Gender: {gender_choice}")
+    
     gender_url = api_url_build("gender", gender_choice.lower())
+    console.print(f"[dim]API URL: {gender_url}[/dim]")
     
     async with httpx.AsyncClient() as client:
         response = await client.get(gender_url)
         if response.status_code != 200:
+            console.print("[bold red]Error:[/bold red] Failed to fetch gender data")
             return {"error": "Failed to fetch gender data"}
 
         gender_data = response.json()
@@ -146,21 +169,32 @@ async def get_pokemon_roles(gender_choice: str):
             "Speedster": []
         }
 
-        # Limit to 20 Pokemon for performance
-        for entry in pokemon_entries[:20]:
-            species_name = entry["pokemon_species"]["name"]
-            pokemon_url = f"https://pokeapi.co/api/v2/pokemon/{species_name}"
-            
-            pokemon_data = await fetch_pokemon_data(pokemon_url)
-            if pokemon_data:
-                # Now categorize_pokemon_role is called as a regular function
-                role = categorize_pokemon_role(pokemon_data["stats"])
-                role_categories[role].append({
-                    "name": pokemon_data["name"],
-                    "sprite": pokemon_data["sprite"],
-                    "types": pokemon_data["types"],
-                    "stats": pokemon_data["stats"]
-                })
+        with console.status("[bold green]Analyzing Pokemon roles...") as status:
+            for entry in pokemon_entries[:20]:
+                species_name = entry["pokemon_species"]["name"]
+                pokemon_url = f"https://pokeapi.co/api/v2/pokemon/{species_name}"
+                
+                pokemon_data = await fetch_pokemon_data(pokemon_url)
+                if pokemon_data:
+                    role = categorize_pokemon_role(pokemon_data["stats"])
+                    role_categories[role].append({
+                        "name": pokemon_data["name"],
+                        "sprite": pokemon_data["sprite"],
+                        "types": pokemon_data["types"],
+                        "stats": pokemon_data["stats"]
+                    })
+                    console.print(f"[dim]Categorized {pokemon_data['name']} as: [bold]{role}[/bold][/dim]")
+
+        # Display role distribution
+        for role, pokemon_list in role_categories.items():
+            panel = Panel(
+                f"Total Pokemon: {len(pokemon_list)}\n" +
+                "\n".join([f"• {p['name']}" for p in pokemon_list[:5]]) +
+                ("\n..." if len(pokemon_list) > 5 else ""),
+                title=f"[bold]{role}[/bold]",
+                border_style={"Tank": "blue", "Attacker": "red", "Support": "green", "Speedster": "yellow"}[role]
+            )
+            console.print(panel)
 
         return role_categories
 

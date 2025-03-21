@@ -1,42 +1,34 @@
 import httpx
 import logging
+from rich.console import Console
+from rich import print as rprint
 
+console = Console()
 logger = logging.getLogger(__name__)
 
 async def fetch_pokemon_data(pokemon_url: str) -> dict:
-    """
-    Fetch and transform Pokemon data from the PokeAPI.
-    
-    Args:
-        pokemon_url (str): The API URL for the Pokemon
-        
-    Returns:
-        dict: Transformed Pokemon data or empty dict if request fails
-        
-    Raises:
-        HTTPException: If the API request fails
-    """
     try:
         async with httpx.AsyncClient() as client:
+            console.print(f"[dim]Fetching data for: {pokemon_url}[/dim]")
             response = await client.get(pokemon_url)
             response.raise_for_status()
             data = response.json()
-            return {
+            
+            transformed_data = {
                 "name": data["name"],
                 "types": [t["type"]["name"] for t in data["types"]],
                 "abilities": [a["ability"]["name"] for a in data["abilities"]],
                 "stats": {s["stat"]["name"]: s["base_stat"] for s in data["stats"]},
                 "sprite": data["sprites"]["front_default"],     
             }
+            
+            console.print(f"[green]✓[/green] Successfully fetched data for: [bold]{data['name']}[/bold]")
+            return transformed_data
     except httpx.HTTPError as e:
-        logger.error(f"Failed to fetch Pokemon data: {str(e)}")
+        console.print(f"[bold red]Error:[/bold red] Failed to fetch Pokemon data: {str(e)}")
         return {}
 
 def categorize_pokemon_role(stats: dict) -> str:
-    """
-    Categorize Pokemon into battle roles based on their stats.
-    Note: This is a synchronous function since it doesn't need to be async
-    """
     # Extract relevant stats
     hp = stats.get("hp", 0)
     defense = stats.get("defense", 0)
@@ -59,4 +51,12 @@ def categorize_pokemon_role(stats: dict) -> str:
         "Support": support_score
     }
     
-    return max(scores.items(), key=lambda x: x[1])[0]
+    role = max(scores.items(), key=lambda x: x[1])[0]
+    
+    # Print score breakdown
+    console.print("[dim]Role scores:[/dim]")
+    for role_name, score in scores.items():
+        color = "blue" if role_name == role else "dim"
+        console.print(f"  [bold {color}]{role_name}:[/bold {color}] {score:.2f}")
+    
+    return role
