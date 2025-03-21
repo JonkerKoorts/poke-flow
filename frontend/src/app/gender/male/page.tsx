@@ -6,6 +6,7 @@ import {
 } from "@/lib/services/api.service";
 import { useSearchParams } from "next/navigation";
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 const MalePage: React.FC = () => {
   const searchParams = useSearchParams();
@@ -17,6 +18,7 @@ const MalePage: React.FC = () => {
       ? JSON.parse(decodeURIComponent(searchParams.get("data")!))
       : null
   );
+  const router = useRouter();
 
   useEffect(() => {
     const fetchAvailableTypes = async () => {
@@ -75,7 +77,8 @@ const MalePage: React.FC = () => {
             {pokemonData.map((pokemon: any) => (
               <div
                 key={pokemon.name}
-                className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200"
+                onClick={() => router.push(`/types/${pokemon.types[0]}`)}
+                className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
               >
                 <img
                   src={pokemon.sprite}

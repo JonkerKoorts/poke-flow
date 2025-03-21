@@ -38,3 +38,16 @@ export const getAvailableTypes = async (gender: string) => {
     return [];
   }
 };
+
+export const getPokemonByType = async (type: string) => {
+  try {
+    const res = await fetch(`${API_URL}/pokemon-by-type/${type}`);
+    if (!res.ok) throw new Error(`Failed to fetch Pokémon of type ${type}`);
+    
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching Pokémon by type:", error);
+    return null;
+  }
+};
