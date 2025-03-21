@@ -1,9 +1,25 @@
 import httpx
+import logging
+
+logger = logging.getLogger(__name__)
 
 async def fetch_pokemon_data(pokemon_url: str) -> dict:
-    async with httpx.AsyncClient() as client:
-        response = await client.get(pokemon_url)
-        if response.status_code == 200:
+    """
+    Fetch and transform Pokemon data from the PokeAPI.
+    
+    Args:
+        pokemon_url (str): The API URL for the Pokemon
+        
+    Returns:
+        dict: Transformed Pokemon data or empty dict if request fails
+        
+    Raises:
+        HTTPException: If the API request fails
+    """
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(pokemon_url)
+            response.raise_for_status()
             data = response.json()
             return {
                 "name": data["name"],
@@ -12,6 +28,8 @@ async def fetch_pokemon_data(pokemon_url: str) -> dict:
                 "stats": {s["stat"]["name"]: s["base_stat"] for s in data["stats"]},
                 "sprite": data["sprites"]["front_default"],     
             }
+    except httpx.HTTPError as e:
+        logger.error(f"Failed to fetch Pokemon data: {str(e)}")
         return {}
 
 def categorize_pokemon_role(stats: dict) -> str:

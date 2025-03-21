@@ -20,6 +20,15 @@ app.add_middleware(
 
 @app.get("/pokemon-by-gender/{gender_choice}")
 async def get_pokemon_by_gender(gender_choice: str):
+    """
+    Fetch Pokemon filtered by gender.
+    
+    Args:
+        gender_choice (str): The gender to filter by ('male' or 'female')
+        
+    Returns:
+        list: List of Pokemon matching the gender criteria
+    """
     gender_url = api_url_build("gender", gender_choice.lower())
 
     async with httpx.AsyncClient() as client:

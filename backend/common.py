@@ -55,6 +55,13 @@ ENDPOINTS = [
     "version-group",
 ]
 SPRITE_EXT = "png"
+POKEMON_LIMIT = 20  # Limit for API requests
+DEFAULT_ROLES = {
+    "Tank": [],
+    "Attacker": [],
+    "Support": [],
+    "Speedster": []
+}
 
 
 def validate(endpoint, resource_id=None):
