@@ -1,6 +1,10 @@
 "use client";
 
-import { getPokemonByType } from "@/lib/services/api.service";
+import {
+  getPokemonByType,
+  getAvailableAbilities,
+  filterPokemonByAbility,
+} from "@/lib/services/api.service";
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
@@ -9,19 +13,72 @@ const TypePage = () => {
   const type = params.type as string;
   const [pokemonData, setPokemonData] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedAbility, setSelectedAbility] = useState<string>("");
+  const [availableAbilities, setAvailableAbilities] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getPokemonByType(type);
+      setIsLoading(true);
+      const [data, abilities] = await Promise.all([
+        getPokemonByType(type),
+        getAvailableAbilities(type),
+      ]);
       setPokemonData(data || []);
+      setAvailableAbilities(abilities || []);
       setIsLoading(false);
     };
     fetchData();
   }, [type]);
 
+  const handleAbilitySelect = async (ability: string) => {
+    setIsLoading(true);
+    setSelectedAbility(ability);
+    if (ability === "") {
+      const data = await getPokemonByType(type);
+      setPokemonData(data || []);
+    } else {
+      const filteredData = await filterPokemonByAbility(type, ability);
+      setPokemonData(filteredData || []);
+    }
+    setIsLoading(false);
+  };
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-semibold mb-4 capitalize">{type} Pokémon</h1>
+
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold mb-2">Filter by Ability:</h2>
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={() => handleAbilitySelect("")}
+            className={`px-3 py-1 rounded transition-all duration-200 ${
+              selectedAbility === ""
+                ? "bg-blue-500 text-white"
+                : "bg-gray-200 hover:bg-gray-300"
+            }`}
+          >
+            All
+          </button>
+          {availableAbilities.map((ability) => (
+            <button
+              key={ability}
+              onClick={() => handleAbilitySelect(ability)}
+              className={`px-3 py-1 rounded transition-all duration-200 ${
+                selectedAbility === ability
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 hover:bg-gray-300"
+              }`}
+            >
+              {ability
+                .split("-")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ")}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {isLoading ? (
         <div className="flex flex-col items-center justify-center min-h-[200px]">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
