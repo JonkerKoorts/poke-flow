@@ -24,7 +24,11 @@ source venv/bin/activate
 
 3. Install the required Python packages:
 ```bash
+# On Windows
 pip install -r requirements.txt
+
+# On macOS/Linux
+pip3 install -r requirements.txt
 ```
 
 4. Start the FastAPI server:
