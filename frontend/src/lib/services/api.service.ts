@@ -12,3 +12,16 @@ export const fetchPokemonByGender = async (gender: string) => {
     return null;
   }
 };
+
+export const filterPokemonByType = async (gender: string, type: string) => {
+  try {
+    const res = await fetch(`${API_URL}/pokemon-by-gender/${gender}/filter/${type}`);
+    if (!res.ok) throw new Error(`Failed to filter ${gender} Pokémon by ${type}`);
+    
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error filtering Pokémon:", error);
+    return null;
+  }
+};
