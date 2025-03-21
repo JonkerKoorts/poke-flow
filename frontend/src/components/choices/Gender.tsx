@@ -3,6 +3,7 @@
 import { fetchPokemonByGender } from "@/lib/services/api.service";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
+import { Button } from "../ui/button";
 
 const Gender = () => {
   const router = useRouter();
@@ -24,11 +25,12 @@ const Gender = () => {
   };
 
   return (
-    <div className="flex justify-center items-center gap-5 mt-10">
-      <button
+    <div className="flex justify-center items-center gap-3 mt-5">
+      <Button
         onClick={() => handleChooseGender("male")}
         disabled={isLoading}
-        className={`px-6 py-2 rounded-lg transition-all duration-200 
+        variant={"outline"}
+        className={`transition-all duration-200 hover:text-white 
           ${
             isLoading && selectedGender === "male"
               ? "bg-blue-400 cursor-not-allowed"
@@ -45,11 +47,12 @@ const Gender = () => {
         ) : (
           "Male"
         )}
-      </button>
-      <button
+      </Button>
+      <Button
         onClick={() => handleChooseGender("female")}
         disabled={isLoading}
-        className={`px-6 py-2 rounded-lg transition-all duration-200 
+        variant={"outline"}
+        className={`rounded-lg transition-all duration-200 hover:text-white
           ${
             isLoading && selectedGender === "female"
               ? "bg-blue-400 cursor-not-allowed"
@@ -66,7 +69,7 @@ const Gender = () => {
         ) : (
           "Female"
         )}
-      </button>
+      </Button>
     </div>
   );
 };
