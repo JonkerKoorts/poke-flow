@@ -24,7 +24,7 @@ const Gender = () => {
   };
 
   return (
-    <div className="flex justify-center items-center gap-10">
+    <div className="flex justify-center items-center gap-5 mt-10">
       <button
         onClick={() => handleChooseGender("male")}
         disabled={isLoading}
