@@ -25,3 +25,16 @@ export const filterPokemonByType = async (gender: string, type: string) => {
     return null;
   }
 };
+
+export const getAvailableTypes = async (gender: string) => {
+  try {
+    const res = await fetch(`${API_URL}/available-types/${gender}`);
+    if (!res.ok) throw new Error(`Failed to fetch available types for ${gender}`);
+    
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching available types:", error);
+    return [];
+  }
+};

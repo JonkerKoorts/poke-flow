@@ -92,4 +92,28 @@ async def filter_gender_pokemon_by_type(gender_choice: str, type_choice: str):
         ]
 
         return filtered_list
+
+@app.get("/available-types/{gender_choice}")
+async def get_available_types(gender_choice: str):
+    # First get the gender-specific pokemon
+    gender_url = api_url_build("gender", gender_choice.lower())
+    async with httpx.AsyncClient() as client:
+        response = await client.get(gender_url)
+        if response.status_code != 200:
+            return {"error": "Failed to fetch gender data"}
+
+        gender_data = response.json()
+        pokemon_entries = gender_data.get("pokemon_species_details", [])
+
+        # Get all pokemon for this gender
+        available_types = set()
+        for entry in pokemon_entries[:20]:  # Limit to 20 for speed
+            species_name = entry["pokemon_species"]["name"]
+            pokemon_url = f"https://pokeapi.co/api/v2/pokemon/{species_name}"
+            
+            pokemon_data = await fetch_pokemon_data(pokemon_url)
+            if pokemon_data:
+                available_types.update(pokemon_data["types"])
+
+        return list(available_types)
     

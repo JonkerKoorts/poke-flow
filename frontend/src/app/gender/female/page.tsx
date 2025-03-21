@@ -1,39 +1,30 @@
 "use client";
 
-import { filterPokemonByType } from "@/lib/services/api.service";
+import {
+  filterPokemonByType,
+  getAvailableTypes,
+} from "@/lib/services/api.service";
 import { useSearchParams } from "next/navigation";
-import React, { useState } from "react";
-
-const POKEMON_TYPES = [
-  "normal",
-  "fire",
-  "water",
-  "electric",
-  "grass",
-  "ice",
-  "fighting",
-  "poison",
-  "ground",
-  "flying",
-  "psychic",
-  "bug",
-  "rock",
-  "ghost",
-  "dragon",
-  "dark",
-  "steel",
-  "fairy",
-];
+import React, { useState, useEffect } from "react";
 
 const FemalePage: React.FC = () => {
   const searchParams = useSearchParams();
   const [selectedType, setSelectedType] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const [availableTypes, setAvailableTypes] = useState<string[]>([]);
   const [pokemonData, setPokemonData] = useState(
     searchParams.get("data")
       ? JSON.parse(decodeURIComponent(searchParams.get("data")!))
       : null
   );
+
+  useEffect(() => {
+    const fetchAvailableTypes = async () => {
+      const types = await getAvailableTypes("female");
+      setAvailableTypes(types);
+    };
+    fetchAvailableTypes();
+  }, []);
 
   const handleTypeSelect = async (type: string) => {
     setIsLoading(true);
@@ -47,24 +38,30 @@ const FemalePage: React.FC = () => {
     <div className="p-4">
       <div className="mb-4">
         <h2 className="text-xl font-semibold mb-2">Filter by Type:</h2>
-        <div className="flex flex-wrap gap-2">
-          {POKEMON_TYPES.map((type) => (
-            <button
-              key={type}
-              onClick={() => handleTypeSelect(type)}
-              disabled={isLoading}
-              className={`px-3 py-1 rounded transition-all duration-200 ${
-                isLoading ? "opacity-50 cursor-not-allowed" : ""
-              } ${
-                selectedType === type
-                  ? "bg-blue-500 text-white"
-                  : "bg-gray-200 hover:bg-gray-300"
-              }`}
-            >
-              {type.charAt(0).toUpperCase() + type.slice(1)}
-            </button>
-          ))}
-        </div>
+        {availableTypes.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {availableTypes.map((type) => (
+              <button
+                key={type}
+                onClick={() => handleTypeSelect(type)}
+                disabled={isLoading}
+                className={`px-3 py-1 rounded transition-all duration-200 ${
+                  isLoading ? "opacity-50 cursor-not-allowed" : ""
+                } ${
+                  selectedType === type
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 hover:bg-gray-300"
+                }`}
+              >
+                {type.charAt(0).toUpperCase() + type.slice(1)}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-12">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+          </div>
+        )}
       </div>
 
       <div className="mt-4">
@@ -94,15 +91,6 @@ const FemalePage: React.FC = () => {
                 </div>
               </div>
             ))}
-          </div>
-        ) : selectedType ? (
-          <div className="text-center py-10">
-            <p className="text-lg text-gray-600">
-              No female Pokémon found of type {selectedType}.
-            </p>
-            <p className="text-sm text-gray-500 mt-2">
-              Try selecting a different type!
-            </p>
           </div>
         ) : null}
       </div>
