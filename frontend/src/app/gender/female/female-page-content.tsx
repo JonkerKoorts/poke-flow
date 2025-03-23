@@ -1,5 +1,6 @@
 "use client";
 
+import TypingText from "@/components/static/text-type";
 import {
   filterPokemonByType,
   getPokemonRoles,
@@ -139,9 +140,12 @@ const FemalePageContent: React.FC<FemalePageContentProps> = ({
           </div>
 
           {/* Add this hint text */}
-          <p className="text-sm text-neutral-300 text-center mb-4">
-            Click on any Pokémon card to explore its type in detail
-          </p>
+          <div className="text-sm text-neutral-300 text-center mb-4">
+            <TypingText
+              text="Click on any Pokémon card to explore its type in detail"
+              className="text-[#FFDE00]"
+            />
+          </div>
 
           {isLoading ? (
             <div className="flex flex-col items-center justify-center min-h-[200px]">
