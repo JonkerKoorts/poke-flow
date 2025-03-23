@@ -10,13 +10,13 @@ export const metadata: Metadata = {
 };
 
 interface PageProps {
-  params: {
+  params: Promise<{
     type: string;
-  };
+  }>;
 }
 
 const TypePage = async ({ params }: PageProps) => {
-  const type = params.type;
+  const { type } = await params;
 
   const [initialPokemonData, availableAbilities] = await Promise.all([
     getPokemonByType(type),
