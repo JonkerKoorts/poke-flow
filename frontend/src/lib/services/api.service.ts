@@ -92,3 +92,16 @@ export const filterPokemonByAbility = async (type: string, ability: string) => {
     return null;
   }
 };
+
+export const getTimeBasedPokemon = async () => {
+  try {
+    const res = await fetch(`${API_URL}/pokemon-by-time`);
+    if (!res.ok) throw new Error('Failed to fetch time-based Pokémon');
+    
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching time-based Pokémon:", error);
+    return null;
+  }
+};

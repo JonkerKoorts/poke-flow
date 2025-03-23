@@ -5,6 +5,7 @@ import {
   filterPokemonByType,
   getPokemonRoles,
 } from "@/lib/services/api.service";
+import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 
@@ -85,7 +86,7 @@ const FemalePageContent: React.FC<FemalePageContentProps> = ({
         <div className="flex justify-center gap-4">
           <button
             onClick={() => setViewMode("types")}
-            className={`px-6 py-2 rounded-full transition-all duration-300 ${
+            className={`px-6 py-2 rounded-full transition-all duration-300 cursor-pointer ${
               viewMode === "types"
                 ? "bg-[#3B4CCA] text-white shadow-[0_0_20px_rgba(59,76,202,0.3)]"
                 : "bg-white/10 text-white hover:bg-white/20"
@@ -95,7 +96,7 @@ const FemalePageContent: React.FC<FemalePageContentProps> = ({
           </button>
           <button
             onClick={() => setViewMode("roles")}
-            className={`px-6 py-2 rounded-full transition-all duration-300 ${
+            className={`px-6 py-2 rounded-full transition-all duration-300 cursor-pointer ${
               viewMode === "roles"
                 ? "bg-[#3B4CCA] text-white shadow-[0_0_20px_rgba(59,76,202,0.3)]"
                 : "bg-white/10 text-white hover:bg-white/20"
@@ -103,6 +104,12 @@ const FemalePageContent: React.FC<FemalePageContentProps> = ({
           >
             View by Roles
           </button>
+          <Link
+            href="/time-pokemon"
+            className="px-6 py-2 text-black rounded-full transition-all duration-300 hover:bg-[#FFDE00] bg-[#FFDE00]"
+          >
+            Time-based Pokemon
+          </Link>
         </div>
       </div>
 

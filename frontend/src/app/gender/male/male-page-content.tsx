@@ -5,6 +5,7 @@ import {
   filterPokemonByType,
   getPokemonRoles,
 } from "@/lib/services/api.service";
+import Link from "next/link";
 import { useSearchParams, useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 
@@ -101,6 +102,12 @@ const MalePageContent: React.FC<MalePageContentProps> = ({ initialTypes }) => {
           >
             View by Roles
           </button>
+          <Link
+            href="/time-pokemon"
+            className="px-6 py-2 text-black rounded-full transition-all duration-300 hover:bg-[#FFDE00] bg-[#FFDE00]"
+          >
+            Time-based Pokemon
+          </Link>
         </div>
       </div>
 

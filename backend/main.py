@@ -7,6 +7,8 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
 from rich import print as rprint
+import random
+from datetime import datetime
 
 console = Console()
 
@@ -241,4 +243,56 @@ async def filter_type_pokemon_by_ability(type_choice: str, ability: str):
                 filtered_pokemon.append(pokemon_data)
 
         return filtered_pokemon
+
+@app.get("/pokemon-by-time")
+async def get_pokemon_by_time():
+    console.rule("[bold purple]Fetching Time-based Random Pokemon")
+    
+    current_hour = datetime.now().hour
+    # Morning: 6-11, Day: 12-17, Evening: 18-23, Night: 0-5
+    time_of_day = (
+        "morning" if 6 <= current_hour < 12
+        else "day" if 12 <= current_hour < 18
+        else "evening" if 18 <= current_hour < 24
+        else "night"
+    )
+    
+    console.print(f"[dim]Current time period: {time_of_day}[/dim]")
+    
+    # Different types for different times of day
+    type_pools = {
+        "morning": ["normal", "flying", "fairy"],
+        "day": ["fire", "grass", "ground"],
+        "evening": ["fighting", "poison", "psychic"],
+        "night": ["dark", "ghost", "dragon"]
+    }
+    
+    selected_type = random.choice(type_pools[time_of_day])
+    type_url = api_url_build("type", selected_type)
+    
+    async with httpx.AsyncClient() as client:
+        response = await client.get(type_url)
+        if response.status_code != 200:
+            return {"error": "Failed to fetch Pokemon data"}
+            
+        type_data = response.json()
+        pokemon_entries = type_data.get("pokemon", [])
+        
+        # Randomly select 20 Pokemon
+        selected_entries = random.sample(
+            pokemon_entries, 
+            min(20, len(pokemon_entries))
+        )
+        
+        pokemon_list = []
+        for entry in selected_entries:
+            pokemon_data = await fetch_pokemon_data(entry["pokemon"]["url"])
+            if pokemon_data:
+                pokemon_data["time_period"] = time_of_day
+                pokemon_list.append(pokemon_data)
+                
+        return {
+            "time_period": time_of_day,
+            "pokemon": pokemon_list
+        }
     
