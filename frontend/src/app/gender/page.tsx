@@ -1,7 +1,7 @@
 import React from "react";
 import Gender from "@/components/choices/Gender";
 
-const GenderPage = () => {
+const GenderPage = async () => {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-[#0B0F2F] via-[#111C44] to-[#0B0F2F] text-white animate-fade-in">
       {/* Title */}
