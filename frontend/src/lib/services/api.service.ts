@@ -96,12 +96,21 @@ export const filterPokemonByAbility = async (type: string, ability: string) => {
 export const getTimeBasedPokemon = async () => {
   try {
     const res = await fetch(`${API_URL}/pokemon-by-time`);
-    if (!res.ok) throw new Error('Failed to fetch time-based Pokémon');
+    if (!res.ok) {
+      console.error("API Error:", await res.text());
+      return {
+        time_period: "day",  // fallback default
+        pokemon: []
+      };
+    }
     
     const data = await res.json();
     return data;
   } catch (error) {
     console.error("Error fetching time-based Pokémon:", error);
-    return null;
+    return {
+      time_period: "day",  // fallback default
+      pokemon: []
+    };
   }
 };

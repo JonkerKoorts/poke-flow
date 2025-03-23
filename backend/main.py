@@ -2,7 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
 from .common import api_url_build
-from backend.helper_functions import fetch_pokemon_data, categorize_pokemon_role
+from backend.helper_functions import (
+    fetch_pokemon_data,
+    fetch_all_pokemon_of_type,
+    categorize_pokemon_role
+)
 from rich.console import Console
 from rich.panel import Panel
 from rich.table import Table
@@ -246,53 +250,59 @@ async def filter_type_pokemon_by_ability(type_choice: str, ability: str):
 
 @app.get("/pokemon-by-time")
 async def get_pokemon_by_time():
-    console.rule("[bold purple]Fetching Time-based Random Pokemon")
-    
-    current_hour = datetime.now().hour
-    # Morning: 6-11, Day: 12-17, Evening: 18-23, Night: 0-5
-    time_of_day = (
-        "morning" if 6 <= current_hour < 12
-        else "day" if 12 <= current_hour < 18
-        else "evening" if 18 <= current_hour < 24
-        else "night"
-    )
-    
-    console.print(f"[dim]Current time period: {time_of_day}[/dim]")
-    
-    # Different types for different times of day
-    type_pools = {
-        "morning": ["normal", "flying", "fairy"],
-        "day": ["fire", "grass", "ground"],
-        "evening": ["fighting", "poison", "psychic"],
-        "night": ["dark", "ghost", "dragon"]
-    }
-    
-    selected_type = random.choice(type_pools[time_of_day])
-    type_url = api_url_build("type", selected_type)
-    
-    async with httpx.AsyncClient() as client:
-        response = await client.get(type_url)
-        if response.status_code != 200:
-            return {"error": "Failed to fetch Pokemon data"}
-            
-        type_data = response.json()
-        pokemon_entries = type_data.get("pokemon", [])
+    """Get Pokemon based on the current time of day with optimized batch processing."""
+    try:
+        console.rule("[bold purple]Fetching Time-based Random Pokemon")
         
-        # Randomly select 20 Pokemon
-        selected_entries = random.sample(
-            pokemon_entries, 
-            min(20, len(pokemon_entries))
-        )
+        # Get time period using dict mapping for O(1) lookup
+        time_periods = {
+            range(6, 12): "morning",
+            range(12, 18): "day",
+            range(18, 24): "evening",
+            range(0, 6): "night"
+        }
+        current_hour = datetime.now().hour
+        time_of_day = next(period for hours, period in time_periods.items() if current_hour in hours)
         
-        pokemon_list = []
-        for entry in selected_entries:
-            pokemon_data = await fetch_pokemon_data(entry["pokemon"]["url"])
-            if pokemon_data:
-                pokemon_data["time_period"] = time_of_day
-                pokemon_list.append(pokemon_data)
-                
-        return {
+        console.print(f"[dim]Current time period: {time_of_day}[/dim]")
+        
+        # Map time periods to Pokemon types
+        type_pools = {
+            "morning": ["normal", "flying", "fairy"],
+            "day": ["fire", "grass", "ground"],
+            "evening": ["fighting", "poison", "psychic"],
+            "night": ["dark", "ghost", "dragon"]
+        }
+        
+        selected_type = random.choice(type_pools[time_of_day])
+        pokemon_list = await fetch_all_pokemon_of_type(selected_type, limit=20)
+        
+        if not pokemon_list:
+            console.print("[bold red]Warning:[/bold red] No Pokemon data fetched, using fallback type")
+            # Try another type as fallback
+            fallback_type = random.choice(type_pools[time_of_day])
+            pokemon_list = await fetch_all_pokemon_of_type(fallback_type, limit=20)
+        
+        # Add time period to each Pokemon
+        for pokemon in pokemon_list:
+            pokemon["time_period"] = time_of_day
+        
+        result = {
             "time_period": time_of_day,
             "pokemon": pokemon_list
+        }
+        
+        # Validate response data
+        if not result["pokemon"]:
+            raise ValueError("No Pokemon data available")
+            
+        return result
+        
+    except Exception as e:
+        console.print(f"[bold red]Error:[/bold red] {str(e)}")
+        # Return a valid response structure even in case of error
+        return {
+            "time_period": "day",  # fallback default
+            "pokemon": []
         }
     
